@@ -12,25 +12,28 @@ import java.util.Scanner;
 import controller.*;
 
 public class Main {
-	private static final String host = "162.210.102.210";
+	private static final String host = "130.226.195.126";
 	private static final int port = 21;
-	private static String username;
-	private static String password;
-	private static Scanner input;
+	private static String username = "anonymous";
+	private static String password = "nothing";
 	
 	public static void main(String[] args) {
-		input = new Scanner(System.in);
-		
-		System.out.println(host + "\nUsername :");
-		username = input.nextLine();
-		
-		System.out.println("Password :");
-		password = input.nextLine();
-		
 		
 		try{
-		
-		new SocketController (new Client(host, port, username, password)).startFileTranfer();
+			
+			Client socket1 = new Client(host, port, username, password);
+			
+			SocketController controller = new SocketController (socket1);
+			
+			int newPort = controller.getCommunication();
+			
+			Client socket2 = new Client("130.226.195.126", newPort, "anonymous", "nothing");
+			
+			SocketController controller2 = new SocketController (socket2);
+			
+			controller2.startFileTranfer();
+			
+			
 		
 		}catch (Exception e){
 			System.out.println("Bad host and port number !");

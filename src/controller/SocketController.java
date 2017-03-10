@@ -27,19 +27,46 @@ public class SocketController {
 
 	public void startFileTranfer(){
 		try{
-			connect(clientSocket.username, clientSocket.password);
+			connect(clientSocket.username, clientSocket.password, true);
+			
+			print(write("RETR data.txt"));
 
 			disconnect();
 
 		}catch (Exception e){
-			System.out.println("Connection failed " + e);
+			print("Connection failed " + e);
 
 		}
 
 	}
 
+	public int getCommunication(){
+		try{
+			connect(clientSocket.username, clientSocket.password, false);
 
-	public void connect(String username, String password) throws Exception{
+			String[] pasv = write("PASV").split(",");
+
+			String[] ports = new String[2];
+			ports[0] = pasv[4];
+			ports[1] = pasv[5].replace(")", "").replace(".", "");
+
+			int communicationPort = Integer.parseInt(ports[0]) * 256 + Integer.parseInt(ports[1]);
+
+			print("Communication port is " + communicationPort);
+
+			//disconnect();
+			
+			return communicationPort;
+
+		}catch (Exception e){
+			print("Connection failed " + e);
+
+		}
+		return -1;
+	}
+
+
+	public void connect(String username, String password, boolean welcome) throws Exception{
 		print("Connection in progress");
 
 		out = new DataOutputStream(clientSocket.getOutputStream()); //writer
@@ -48,7 +75,8 @@ public class SocketController {
 		in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream())); //read buffer
 		print("Input ready");
 
-		showWelcomeMessage();
+		if(welcome)
+			showWelcomeMessage();
 
 		write("USER " + username);
 		write("PASS " + password);
@@ -58,17 +86,19 @@ public class SocketController {
 		print(verifyMessage);
 
 		if(Integer.parseInt(verifyMessage.split(" ")[0]) == 230)
-			print("Connection success");
-		
+			print("login success");
+
 		else
 			throw new Exception("username or/and password invalid");
 
+		print("Connection etablished");
 
 	}
 
 	public void disconnect() throws IOException{
-		clientSocket.close();
+		print(write("QUIT"));
 	}
+
 
 	private String write(String message) throws IOException{
 		out.writeBytes(message + "\n");
@@ -82,7 +112,7 @@ public class SocketController {
 	private void print(String message){
 		System.out.println(message);
 	}
-	
+
 	private void showWelcomeMessage() throws IOException{
 		print("------------------Welcome message-------------------");
 
@@ -90,6 +120,7 @@ public class SocketController {
 		print(read());
 		print(read());
 		print(read());
+		
 		print("---------------------------------------------------");
 	}
 
