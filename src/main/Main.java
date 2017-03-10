@@ -16,10 +16,10 @@ public class Main {
 	private static final int port = 21;
 	private static String username;
 	private static String password;
+	private static Scanner input;
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Scanner input = new Scanner(System.in);
+		input = new Scanner(System.in);
 		
 		System.out.println(host + "\nUsername :");
 		username = input.nextLine();
